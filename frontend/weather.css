@@ -1,0 +1,95 @@
+.forecast-table-panel {
+  margin-top: 15px;
+  padding: 19px;
+  border: 1px solid #e9eee8;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.forecast-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+@media (max-width: 740px) {
+.forecast-table-panel {
+    padding: 16px 12px;
+  }
+}
+
+.weather-metrics {
+  margin-top: 0;
+}
+
+.humidity {
+  color: #7288ab;
+  background: #eef2f8;
+}
+
+.wetness {
+  color: #598c76;
+  background: #eaf5ee;
+}
+
+.sunlight {
+  color: #b3934c;
+  background: #faf4e5;
+}
+
+.humidity-decoration {
+  color: #eef2f8;
+}
+
+.wetness-decoration {
+  color: #edf5ee;
+}
+
+.solar-decoration {
+  color: #f7f2e5;
+}
+
+.full-panel {
+  margin-top: 18px;
+  padding-bottom: 18px;
+}
+
+.forecast-note {
+  margin: 11px 25px 0;
+  color: #8d998e;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.forecast-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.forecast-table th {
+  padding: 0 12px 10px;
+  color: #98a297;
+  font: 700 8px "Manrope", sans-serif;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.forecast-table td {
+  padding: 11px 12px;
+  border-top: 1px solid #f0f2ef;
+  color: #68756a;
+  font-size: 9px;
+}
+
+.forecast-table td:first-child {
+  color: #3f5943;
+  font-weight: 600;
+}
+
+.forecast-table .table-empty {
+  padding: 22px 10px;
+  color: #9da69e;
+  text-align: center;
+}

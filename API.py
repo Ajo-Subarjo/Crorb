@@ -4,43 +4,56 @@ from openai import OpenAI
 
 dotenv.load_dotenv()
 
-API_KEY = os.environ.get("OPENROUTER_API_KEY")   # JANGAN hardcode di kode!
+API_KEY = os.environ.get("OPENROUTER_API_KEY")
 MODEL   = "nvidia/nemotron-3.5-super-vl:free"
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPEN_ROUTER"),
+    api_key=API_KEY or os.getenv("OPEN_ROUTER"),
     default_headers={
         "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "Rekomendasi Tanam",
+        "X-Title": "Crop Recommendations",
     },
 )
 
-SYSTEM_PROMPT = """Kamu adalah ahli agronomi Indonesia.
-Kamu menerima ringkasan data satu lahan dalam format JSON dengan bagian:
-- "topografi": elevasi (m dpl) dan lereng (derajat)
-- "iklim": suhu, kelembapan, curah hujan (harian/bulanan/tahunan), soil wetness
-- "tanah": tekstur (clay/sand/silt %), pH, bahan organik (soc), nitrogen
-- "data_tidak_tersedia": daftar parameter yang nilainya kosong
+SYSTEM_PROMPT = """You are an agronomist.
+You receive a summary of one field's data, separated into:
+- "iklim_historis": historical monthly NASA POWER data, including soil wetness
+- "prakiraan_mendatang": Meteomatics monthly forecast data for the coming months
+- "topografi": elevation (meters above sea level) and slope (degrees)
+- "tanah": soil texture, pH, organic matter, and nitrogen
+- "data_tidak_tersedia": parameters with missing values
 
-Aturan:
-1. Parameter yang ada di "data_tidak_tersedia" TIDAK BOLEH dikarang. Sebutkan
-   bahwa datanya belum tersedia dan jelaskan dampaknya pada rekomendasi.
-2. Lereng > 15 derajat perlu terasering; > 30 derajat tidak cocok untuk
-   tanaman semusim.
-3. Balas HANYA JSON valid dengan struktur:
+Rules:
+1. Never invent parameters listed in "data_tidak_tersedia". State that the data
+   is unavailable and explain how this affects the recommendation.
+2. Make a recommendation by comparing historical patterns, the upcoming forecast,
+   and the latest Sentinel-2 NDVI as an indicator of current vegetation.
+   Use forecast rainfall, water balance, temperature, and humidity to assess
+   growing-season suitability, and use historical soil wetness as context.
+   If both data sources are available, mention historical and forecast findings in "alasan".
+3. Meteomatics forecasts do NOT currently provide soil wetness measurements.
+   Do not treat forecast rainfall or water balance as soil wetness, and do not
+   invent future soil-wetness values. Explain this limitation when relevant.
+4. NDVI measures vegetation greenness in imagery; it does not identify crop types
+   or guarantee yields. Use it only as supporting context.
+5. Clearly distinguish historical conditions, satellite imagery, and forecasts.
+   A forecast is an estimate, not an observation or certainty.
+6. Slopes above 15 degrees require terracing; slopes above 30 degrees are not
+   suitable for annual crops.
+7. Reply ONLY with valid JSON in this structure:
 {
-  "tanaman_utama": "nama tanaman",
-  "alternatif": ["tanaman1", "tanaman2"],
+  "tanaman_utama": "crop name",
+  "alternatif": ["crop 1", "crop 2"],
   "skor_kecocokan": 0-100,
-  "alasan": "penjelasan singkat dengan bahasa sederhana",
-  "catatan_data": "data apa yang kurang dan pengaruhnya"
+  "alasan": "a brief explanation in clear, simple English",
+  "catatan_data": "missing data and its impact"
 }
-Gunakan bahasa Indonesia yang mudah dipahami petani."""
+Write all natural-language values in clear, simple English."""
 
 
 def _extract_json(teks: str) -> dict:
-    """Jaga-jaga kalau model membungkus JSON dengan teks/code fence."""
+    """Handle responses wrapped in prose or a code fence."""
     try:
         return json.loads(teks)
     except json.JSONDecodeError:
@@ -60,13 +73,14 @@ def _rata(nilai) -> float | None:
 
 
 def _ringkas_data(data: dict) -> dict:
-    """Ubah payload mentah (mpc + nasa_power + soilgrids) jadi ringkasan
-    yang ringkas dan aman dibaca model."""
+    """Summarize historical and forecast data for agronomic analysis."""
     mpc  = data.get("mpc") or {}
     nasa = data.get("nasa_power") or {}
     sg   = data.get("soilgrids") or {}
+    meteomatics = data.get("meteomatics") or {}
+    ndvi = data.get("ndvi") or {}
 
-    # "202513" = agregat tahunan NASA POWER, sisanya bulanan
+    # "202513" is NASA POWER's annual aggregate; other entries are monthly.
     bulanan = {k: v for k, v in nasa.items() if len(k) == 6 and not k.endswith("13")}
     tahunan = next((v for k, v in nasa.items() if k.endswith("13")), {})
 
@@ -79,6 +93,36 @@ def _ringkas_data(data: dict) -> dict:
     hujan_tahunan = round(hujan_harian * 365.25, 1) if hujan_harian is not None else None
     if hujan_tahunan is None and _angka(tahunan.get("rainfall")):
         hujan_tahunan = round(tahunan["rainfall"] * 365.25, 1)
+
+    historis_bulanan = {
+        bulan: {
+            "suhu_c": nilai.get("temperature"),
+            "kelembapan_udara_persen": nilai.get("humidity"),
+            "curah_hujan_mm_per_hari": nilai.get("rainfall"),
+            "soil_wetness_top_layer": nilai.get("soil_wetness"),
+            "radiasi_matahari": nilai.get("solar_radiation"),
+        }
+        for bulan, nilai in sorted(bulanan.items())
+    }
+
+    prakiraan_bulanan = {
+        bulan: {
+            field: nilai.get(field)
+            for field in (
+                "rainfall_mm",
+                "evaporation_mm",
+                "water_balance_mm",
+                "temp_max_c",
+                "temp_min_c",
+                "humidity_pct",
+                "wind_kmh",
+                "solar_wh_m2_day",
+            )
+            if _angka(nilai.get(field))
+        }
+        for bulan, nilai in sorted(meteomatics.items())
+        if isinstance(nilai, dict)
+    }
 
     def per_lapisan(field):
         d = sg.get(field) or {}
@@ -107,7 +151,7 @@ def _ringkas_data(data: dict) -> dict:
             "lereng_min_derajat": mpc.get("slope_min"),
             "lereng_max_derajat": mpc.get("slope_max"),
         },
-        "iklim": {
+        "iklim_historis": {
             "suhu_rata2_c":              suhu,
             "kelembapan_rata2_persen":   lembap,
             "curah_hujan_mm_per_hari":   hujan_harian,
@@ -115,20 +159,38 @@ def _ringkas_data(data: dict) -> dict:
             "curah_hujan_mm_per_tahun":  hujan_tahunan,
             "soil_wetness_rata2":        wetness,
             "bulan_tersedia":            sorted(bulanan),
+            "data_bulanan":              historis_bulanan,
+        },
+        "prakiraan_mendatang": {
+            "sumber": "Meteomatics",
+            "soil_wetness_langsung": None,
+            "data_bulanan": prakiraan_bulanan,
+        },
+        "vegetasi_satelit": {
+            "sumber": "Sentinel-2",
+            "tanggal_citra": ndvi.get("scene_date"),
+            "ndvi_rata2": ndvi.get("mean"),
+            "ndvi_median": ndvi.get("median"),
+            "tutupan_awan_persen": ndvi.get("cloud_cover_pct"),
         },
         "tanah": tanah,
     }
 
-    kosong = [f"{bagian}.{k}" for bagian in ("topografi", "iklim")
+    kosong = [f"{bagian}.{k}" for bagian in ("topografi", "iklim_historis")
               for k, v in ringkas[bagian].items() if v is None]
     kosong += [f"tanah.{k}" for k, v in tanah.items()
                if k != "per_lapisan" and v is None]
+    if not prakiraan_bulanan:
+        kosong.append("prakiraan_mendatang.data_bulanan")
+    kosong.append("prakiraan_mendatang.soil_wetness_langsung")
+    if ndvi.get("mean") is None:
+        kosong.append("vegetasi_satelit.ndvi_rata2")
     ringkas["data_tidak_tersedia"] = kosong
     return ringkas
 
 
 def analisis_lokasi(nama_lokasi: str, data: dict) -> dict:
-    """data = payload mentah: {"mpc": {...}, "nasa_power": {...}, "soilgrids": {...}}"""
+    """Analyze raw topography, historical climate, soil, and forecast data."""
     payload = {"nama_lokasi": nama_lokasi, "data": _ringkas_data(data)}
 
     resp = client.chat.completions.create(
@@ -144,17 +206,20 @@ def analisis_lokasi(nama_lokasi: str, data: dict) -> dict:
 
 
 def ranking_lokasi(daftar_lokasi: list) -> dict:
-    """daftar_lokasi = [{"nama_lokasi": "...", "data": {...payload mentah...}}, ...]"""
+    """Rank locations supplied as [{"nama_lokasi": "...", "data": {...}}, ...]."""
     ringkas = [
         {"nama_lokasi": l["nama_lokasi"], "data": _ringkas_data(l["data"])}
         for l in daftar_lokasi
     ]
     prompt = (
-        "Berikut ringkasan data beberapa lokasi (JSON array). "
-        "Urutkan dari lokasi yang PALING BAGUS untuk ditanami. "
-        "Perhatikan lereng, elevasi, dan lengkapi catatan bila ada data yang kosong. "
-        'Balas HANYA JSON: {"ranking":[{"nama_lokasi":"...","tanaman_terbaik":"...",'
-        '"skor":0-100,"catatan":"alasan singkat"}]} — urut skor tertinggi dulu.\n\n'
+        "Here is a summary of data for several locations (JSON array). "
+        "Rank them from most to least suitable for farming. "
+        "Compare historical NASA POWER climate data with the upcoming Meteomatics forecast. "
+        "Consider historical soil wetness, forecast rainfall and water balance, "
+        "slope, elevation, and note any missing data. Do not invent forecast soil wetness "
+        "because Meteomatics does not provide it. "
+        'Reply ONLY with JSON: {"ranking":[{"nama_lokasi":"...","tanaman_terbaik":"...",'
+        '"skor":0-100,"catatan":"brief reason"}]} — sort by highest score first.\n\n'
         + json.dumps(ringkas, ensure_ascii=False)
     )
     resp = client.chat.completions.create(

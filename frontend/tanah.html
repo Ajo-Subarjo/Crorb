@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Explore soil pH, texture, nitrogen, and organic carbon in your field." />
+    <title>Soil Conditions — Crorb</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/soil.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="Crorb home">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none"><path d="M18 29V15m0 7c-6 0-10-4-10-10 6 0 10 4 10 10Zm0-5c0-6 4-10 10-10 0 6-4 10-10 10Z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span>crorb<span class="brand-period">.</span></span>
+        </a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="navigation" aria-label="Main navigation">
+          <a class="nav-link" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Field overview</span></a>
+          <a class="nav-link" href="/cuaca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5m0 14h16M7 15l4-4 3 2 6-7"/></svg><span>Weather &amp; climate</span></a>
+          <a class="nav-link active" href="/tanah.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="8" cy="7" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="10" cy="17" r="1.5"/></svg><span>Soil conditions</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="field-note"><div class="field-note-icon" aria-hidden="true">✳</div><p>Good decisions<br />start with the soil.</p><span>Know your field. Grow better.</span></div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs"><a href="/">Workspace</a><span class="crumb-divider">/</span><strong>Soil conditions</strong></div>
+          <div class="topbar-right"><span class="today" id="today-label"></span><span class="topbar-divider"></span><span class="status-dot"></span><span class="status-label">Data updates with each analysis</span></div>
+        </header>
+        <div class="page-content">
+          <section class="page-intro">
+            <div class="eyebrow"><span class="eyebrow-line"></span> KNOW YOUR GROWING MEDIUM</div>
+            <div class="page-intro-row"><div><h1>Know your soil,<br /><span>care for its potential.</span></h1><p class="welcome-copy">Explore soil properties at two depths to better understand your growing medium.</p></div><a class="secondary-button" href="/">← Analyze a field</a></div>
+          </section>
+          <section class="soil-overview">
+            <div class="section-title-row"><div><span class="section-kicker">SOILGRIDS DATA</span><h2>Soil properties</h2></div><span class="data-caption" id="data-caption">Analyze a location to load data</span></div>
+            <article class="panel soil-detail-panel">
+              <div class="soil-depth-heading"><span>PROPERTY</span><span>0–5 cm</span><span>5–15 cm</span></div>
+              <div class="soil-list soil-depth-list" id="soil-list">
+                <div class="soil-empty">Soil data will appear after analyzing a location.</div>
+                <div class="soil-empty">(Not all Region have this data)</div>
+              </div>
+              <p class="soil-footnote"><span>i</span> Values are shown by depth based on data available from SoilGrids.</p>
+            </article>
+          </section>
+          <section class="soil-note-grid">
+            <article class="panel soil-note-card"><span class="soil-note-icon">⌁</span><div><h3>Soil texture</h3><p>The balance of clay, silt, and sand affects how well soil stores water and nutrients.</p></div></article>
+            <article class="panel soil-note-card"><span class="soil-note-icon">✳</span><div><h3>Soil fertility</h3><p>pH, nitrogen, and organic carbon provide an initial picture of growing-medium conditions.</p></div></article>
+          </section>
+          <footer class="page-footer"><span>crorb<span class="brand-period">.</span></span><span>Made to help your fields grow.</span></footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

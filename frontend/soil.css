@@ -1,0 +1,121 @@
+.soil-depth-heading, .soil-depth-list .soil-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1.5fr) repeat(2, minmax(95px, 1fr));
+  align-items: center;
+  gap: 12px;
+}
+
+.soil-depth-list .soil-row {
+  min-height: 43px;
+  padding: 0 9px;
+}
+
+.soil-depth-list .soil-row>span {
+  color: #536756;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.soil-depth-list .soil-row>strong {
+  color: #758477;
+  text-align: right;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.soil-depth-list .soil-empty {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 740px) {
+.soil-depth-heading, .soil-depth-list .soil-row {
+    grid-template-columns: minmax(100px, 1.2fr) repeat(2, minmax(80px, 1fr));
+    gap: 7px;
+  }
+}
+
+@media (max-width: 410px) {
+.soil-depth-heading, .soil-depth-list .soil-row {
+    grid-template-columns: minmax(90px, 1fr) repeat(2, minmax(70px, .8fr));
+  }
+}
+
+.soil-depth-panel .soil-footnote, .soil-detail-panel .soil-footnote {
+  margin: 14px 9px 0;
+  font-size: 8px;
+}
+
+.soil-depth-list {
+  display: grid;
+}
+
+.soil-depth-heading {
+  padding: 1px 9px 10px;
+  color: #9ba69b;
+  font: 700 8px "Manrope", sans-serif;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+.soil-depth-heading span:not(:first-child) {
+  text-align: right;
+}
+
+.soil-note-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.soil-note-card {
+  display: flex;
+  min-height: 105px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+
+.soil-note-icon {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  place-items: center;
+  border-radius: 8px;
+  color: #608663;
+  background: #edf4eb;
+}
+
+.soil-note-card h3 {
+  margin: 1px 0 6px;
+  color: #354b39;
+  font: 700 11px "Manrope", sans-serif;
+}
+
+.soil-note-card p {
+  margin: 0;
+  color: #89948a;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+@media (max-width: 740px) {
+.soil-note-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.soil-overview {
+  margin-top: 27px;
+}
+
+.soil-detail-panel {
+  padding: 15px 20px 14px;
+}
+
+@media (max-width: 740px) {
+.soil-detail-panel {
+    padding: 13px 10px;
+  }
+}
