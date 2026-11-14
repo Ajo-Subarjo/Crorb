@@ -1,41 +1,53 @@
 import requests
 
-url = "https://power.larc.nasa.gov/api/temporal/daily/point"
-
-params = {
-    "parameters": "T2M,RH2M,GWETTOP,PRECTOTCORR",  
-    "community": "AG",
-    "longitude": 106.8456,
-    "latitude": -6.2088,
-    "start": "20250101",
-    "end": "20250112",
-    "format": "JSON"
+PARAMS = {
+    "T2M": "temperature",
+    "RH2M": "humidity",
+    "GWETTOP": "soil_wetness",
+    "PRECTOTCORR": "rainfall",
+    "ALLSKY_SFC_SW_DWN": "solar_radiation",
 }
 
-response = requests.get(url, params=params)
-response.raise_for_status()
-data = response.json()
+def get_nasa_data(lon, lat, start, end):
+    url = "https://power.larc.nasa.gov/api/temporal/monthly/point"
 
-# Extract the parameter container dict
-parameters_data = data["properties"]["parameter"]
+    params = {
+        "parameters": ",".join(PARAMS),
+        "community": "AG",
+        "longitude": lon,
+        "latitude": lat,
+        "start": start,
+        "end": end,
+        "format": "JSON",
+    }
 
-# Use T2M keys as our date reference list
-dates = list(parameters_data["T2M"].keys())
+    try:
+        response = requests.get(url, params=params, timeout=30)
 
-# Print a neat header
-print(f"{'Date':<10} | {'Temp (°C)':<10} | {'Humidity (%)':<12} | {'Soil Wetness':<14} | {'Precip (mm)':<12}")
-print("-" * 65)
+        if not response.ok:
+            print(f"NASA POWER API Error: {response.status_code}")
+            print(response.text)
+            return {}
 
-for date in dates:
-    t2m = parameters_data["T2M"].get(date, -999)
-    rh2m = parameters_data["RH2M"].get(date, -999)
-    gwettop = parameters_data["GWETTOP"].get(date, -999)
-    prectot = parameters_data["PRECTOTCORR"].get(date, -999)
+        series = response.json()["properties"]["parameter"]
 
-    # Convert -999 (NASA's missing flag) to a readable string
-    t2m_str = f"{t2m:.2f}" if t2m != -999 else "N/A"
-    rh2m_str = f"{rh2m:.2f}" if rh2m != -999 else "N/A"
-    gwettop_str = f"{gwettop:.4f}" if gwettop != -999 else "N/A"
-    prectot_str = f"{prectot:.2f}" if prectot != -999 else "N/A"
+        result = {}
+        for date in series["T2M"]:
+            result[date] = {
+                name: (None if series[code].get(date) == -999 else series[code].get(date))
+                for code, name in PARAMS.items()
+            }
 
-    print(f"{date:<10} | {t2m_str:<10} | {rh2m_str:<12} | {gwettop_str:<14} | {prectot_str:<12}")
+        return result
+
+    except requests.RequestException as e:
+        print(f"NASA POWER API error: {e}")
+        return {}
+
+    except (KeyError, ValueError, TypeError) as e:
+        print(f"Data processing error: {e}")
+        return {}
+
+
+if __name__ == "__main__":
+    print(get_nasa_data(lon=106.8456, lat=-6.2088, start="2025", end="2025"))
