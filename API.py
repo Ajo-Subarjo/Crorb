@@ -1,12 +1,15 @@
 import os, json, re
+import dotenv
 from openai import OpenAI
+
+dotenv.load_dotenv()
 
 API_KEY = os.environ.get("OPENROUTER_API_KEY")   # JANGAN hardcode di kode!
 MODEL   = "nvidia/nemotron-3.5-super-vl:free"
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
+    api_key=os.getenv("OPEN_ROUTER"),
     default_headers={
         "HTTP-Referer": "http://localhost:3000",
         "X-Title": "Rekomendasi Tanam",
