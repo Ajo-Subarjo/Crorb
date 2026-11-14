@@ -1,0 +1,116 @@
+{
+    "mpc": {
+        "elevation": 246.61219787597656,
+        "elevation_min": -17.04190444946289,
+        "elevation_max": 3020.434814453125,
+        "slope": 82.94554138183594,
+        "slope_min": 0.0,
+        "slope_max": 89.99977111816406
+    },
+    "nasa_power": {
+        "202501": {
+            "temperature": 27.08,
+            "humidity": 86.4,
+            "soil_wetness": 0.93,
+            "rainfall": 17.86
+        },
+        "202502": {
+            "temperature": 27.05,
+            "humidity": 86.01,
+            "soil_wetness": 0.96,
+            "rainfall": 10.44
+        },
+        "202503": {
+            "temperature": 27.55,
+            "humidity": 85.25,
+            "soil_wetness": 0.94,
+            "rainfall": 6.82
+        },
+        "202504": {
+            "temperature": 27.91,
+            "humidity": 82.37,
+            "soil_wetness": 0.93,
+            "rainfall": 6.85
+        },
+        "202505": {
+            "temperature": 28.47,
+            "humidity": 81.64,
+            "soil_wetness": 0.92,
+            "rainfall": 7.96
+        },
+        "202506": {
+            "temperature": 27.87,
+            "humidity": 82.66,
+            "soil_wetness": 0.93,
+            "rainfall": 6.98
+        },
+        "202507": {
+            "temperature": 27.45,
+            "humidity": 81.17,
+            "soil_wetness": 0.93,
+            "rainfall": 5.32
+        },
+        "202508": {
+            "temperature": 27.33,
+            "humidity": 81.4,
+            "soil_wetness": 0.89,
+            "rainfall": 5.13
+        },
+        "202509": {
+            "temperature": 27.81,
+            "humidity": 80.54,
+            "soil_wetness": 0.88,
+            "rainfall": 5.44
+        },
+        "202510": {
+            "temperature": 28.05,
+            "humidity": 80.53,
+            "soil_wetness": 0.89,
+            "rainfall": 6.84
+        },
+        "202511": {
+            "temperature": 27.67,
+            "humidity": 82.03,
+            "soil_wetness": 0.9,
+            "rainfall": 7.18
+        },
+        "202512": {
+            "temperature": 27.34,
+            "humidity": 84.97,
+            "soil_wetness": 0.92,
+            "rainfall": 9.41
+        },
+        "202513": {
+            "temperature": 27.63,
+            "humidity": 82.9,
+            "soil_wetness": 0.92,
+            "rainfall": 8.01
+        }
+    },
+    "soilgrids": {
+        "clay": {
+            "0-5cm": null,
+            "5-15cm": null
+        },
+        "nitrogen": {
+            "0-5cm": null,
+            "5-15cm": null
+        },
+        "phh2o": {
+            "0-5cm": null,
+            "5-15cm": null
+        },
+        "sand": {
+            "0-5cm": null,
+            "5-15cm": null
+        },
+        "silt": {
+            "0-5cm": null,
+            "5-15cm": null
+        },
+        "soc": {
+            "0-5cm": null,
+            "5-15cm": null
+        }
+    }
+}
