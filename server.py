@@ -220,8 +220,8 @@ class CrorbHandler(BaseHTTPRequestHandler):
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     port = int(os.getenv("PORT", "8000"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), CrorbHandler)
-    logger.info("Crorb is running at http://127.0.0.1:%s", port)
+    server = ThreadingHTTPServer(("0.0.0.0", port), CrorbHandler)
+    logger.info("Crorb is listening on port %s", port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

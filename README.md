@@ -4,6 +4,12 @@ Crorb combines weather, soil, and elevation data to help assess a farm location 
 
 ## Run the web app
 
+Install the Python dependencies from the repository root:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
 Start the local web server from the repository root:
 
 ```powershell

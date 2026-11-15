@@ -211,7 +211,7 @@ a {
 }
 
 .page-content {
-  width: min(1120px, 100%);
+  width: min(1600px, 100%);
   min-width: 0;
   margin: 0 auto;
   padding: 38px 5.2% 20px;

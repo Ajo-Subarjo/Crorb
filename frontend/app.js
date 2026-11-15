@@ -203,7 +203,7 @@ function renderRecommendation(recommendation, error, location) {
       <div class="empty-plant" aria-hidden="true"><span>!</span></div>
       <h2>${error ? "Field data loaded." : "Analysis is not available yet."}</h2>
       <p>${error || "Try again when data sources are available."}</p>
-      <div class="recommendation-footer"><span>◎</span> ${escapeHtml(location.name)}</div>
+      <div class="recommendation-footer"><span>◎</span> AI recommendation for ${escapeHtml(location.name)}</div>
     `;
     return;
   }
@@ -223,7 +223,7 @@ function renderRecommendation(recommendation, error, location) {
     <p class="recommendation-reason">${escapeHtml(recommendation.alasan || "No explanation available.")}</p>
     ${alternatives.length ? `<div class="alternatives"><span>ALTERNATIVES</span>${alternatives.map((crop) => `<b>${escapeHtml(crop)}</b>`).join("")}</div>` : ""}
     ${recommendation.catatan_data ? `<p class="data-note">${escapeHtml(recommendation.catatan_data)}</p>` : ""}
-    <div class="recommendation-footer"><span>◎</span> ${escapeHtml(location.name)}</div>
+    <div class="recommendation-footer"><span>◎</span> AI recommendation for ${escapeHtml(location.name)}</div>
   `;
 }
 

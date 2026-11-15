@@ -1,0 +1,11 @@
+numpy>=2.5
+openai>=3.51
+pillow>=13.0
+planetary_computer>=1.0
+pyproj>=3.8
+pystac_client>=0.9
+python-dotenv>=1.2
+rasterio>=1.5
+requests>=2.34
+rioxarray>=0.24
+xarray_spatial>=0.10
