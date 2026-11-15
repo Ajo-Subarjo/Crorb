@@ -23,3 +23,13 @@ The dashboard has three pages: **Field Overview**, **Weather & Climate**, and **
 On the overview page, use the satellite map to draw a field boundary. Crorb uses the bounding-box midpoint as the analysis latitude/longitude. When you analyze the field, it loads the latest suitable Sentinel-2 L2A image from Microsoft Planetary Computer and displays its NDVI results first, then collects the remaining weather, soil, and terrain data and generates the crop recommendation. If Sentinel-2 imagery is unavailable, the rest of the analysis continues.
 
 The dashboard can display data from providers that are available. Configure `METEOMATICS_USERNAME` and `METEOMATICS_PASSWORD` for the monthly forecast, and `OPENROUTER_API_KEY` for AI crop recommendations. The data sources may take a little while to respond.
+
+## Deploy to Railway
+
+Deploy the repository as a Railway web service. The server reads Railway's `PORT` environment variable and binds to `0.0.0.0`.
+
+Add these variables in the Railway service settings:
+
+- `OPENROUTER_API_KEY`
+- `METEOMATICS_USERNAME`
+- `METEOMATICS_PASSWORD`

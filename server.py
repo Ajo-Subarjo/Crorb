@@ -202,9 +202,15 @@ class CrorbHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"ndvi": ndvi})
             return
 
-        data, source_errors = _fetch_data(location)
-        data["ndvi"] = _ndvi_summary(payload)
-        recommendation, recommendation_error = _get_recommendation(location["name"], data)
+        try:
+            data, source_errors = _fetch_data(location)
+            data["ndvi"] = _ndvi_summary(payload)
+            recommendation, recommendation_error = _get_recommendation(location["name"], data)
+        except Exception:
+            logger.exception("Analyze failed")
+            self._send_json(500, {"error": "Analysis failed on the server. Check the logs."})
+            return
+
         self._send_json(200, {
             "location": location,
             "data": data,
